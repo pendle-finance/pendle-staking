@@ -10,7 +10,8 @@ const CONTRACTS = `${__dirname}/../build/artifacts/contracts`;
 const READDIR = promisify(fs.readdir);
 const STAT = promisify(fs.stat);
 const LIST = [
-  'XPendle.sol',
+  'SingleStakingManager.sol',
+  'SingleStaking.sol'
 ];
 
 async function generateReport() {
