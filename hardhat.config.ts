@@ -1,13 +1,11 @@
-import "@nomiclabs/hardhat-truffle5";
 import "@nomiclabs/hardhat-waffle";
-import "@nomiclabs/hardhat-web3";
 import "@tenderly/hardhat-tenderly";
 import * as dotenv from "dotenv";
 // import "hardhat-gas-reporter";
-import "hardhat-typechain";
+// import "hardhat-typechain";
 import { HardhatUserConfig } from "hardhat/types";
 import "solidity-coverage";
-import "@tenderly/hardhat-tenderly";
+// import "@tenderly/hardhat-tenderly";
 dotenv.config();
 const dummyPrivateKey = '1111111111111111111111111111111111111111111111111111111111111111';
 
@@ -25,12 +23,12 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
-      forking: {
-        // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
-        // url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`,
-        url: 'http://localhost:8545',
-        // blockNumber: 12372265
-      },
+      // forking: {
+      //   // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+      //   // url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`,
+      //   url: 'http://localhost:8545',
+      //   // blockNumber: 12372265
+      // },
       accounts: [
         // 5 accounts with 10^14 ETH each
         // Addresses:
