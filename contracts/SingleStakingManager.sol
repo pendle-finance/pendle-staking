@@ -37,11 +37,14 @@ contract SingleStakingManager is Ownable {
         rewardPerBlock = _rewardPerBlock;
     }
 
+    function getBlocksLeft() public view returns (uint256 blocksLeft) {
+        uint256 currentRewardBalance = rewardToken.balanceOf(address(this));
+        blocksLeft = currentRewardBalance.div(rewardPerBlock);
+    }
+
     // Distribute the rewards to the staking contract, until the latest block, or until we run out of rewards
     function _distributeRewardsInternal() internal {
-        uint256 currentRewardBalance = rewardToken.balanceOf(address(this));
-        uint256 blocksToDistribute =
-            min(block.number.sub(lastDistributedBlock), currentRewardBalance.div(rewardPerBlock));
+        uint256 blocksToDistribute = min(block.number.sub(lastDistributedBlock), getBlocksLeft());
         lastDistributedBlock += blocksToDistribute;
 
         rewardToken.safeTransfer(stakingContract, blocksToDistribute.mul(rewardPerBlock));
