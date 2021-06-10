@@ -18,12 +18,14 @@ contract SingleStakingManager is Ownable {
     uint256 public rewardPerBlock;
     uint256 public lastDistributedBlock;
 
-    constructor(IERC20 _rewardToken, uint256 _rewardPerBlock) {
+    constructor(IERC20 _rewardToken, uint256 _rewardPerBlock, uint256 _startBlock) {
         require(address(_rewardToken) != address(0), "ZERO_ADDRESS");
         require(_rewardPerBlock != 0, "ZERO_REWARD_PER_BLOCK");
+        require(_startBlock > block.number, "PAST_BLOCK_START");
         rewardToken = _rewardToken;
+        rewardPerBlock = _rewardPerBlock;
         stakingContract = address(new SingleStaking(_rewardToken));
-        lastDistributedBlock = block.number;
+        lastDistributedBlock = _startBlock;
     }
 
     function distributeRewards() external {
@@ -44,10 +46,12 @@ contract SingleStakingManager is Ownable {
 
     // Distribute the rewards to the staking contract, until the latest block, or until we run out of rewards
     function _distributeRewardsInternal() internal {
-        uint256 blocksToDistribute = min(block.number.sub(lastDistributedBlock), getBlocksLeft());
-        lastDistributedBlock += blocksToDistribute;
+        if (lastDistributedBlock < block.number) {
+            uint256 blocksToDistribute = min(block.number.sub(lastDistributedBlock), getBlocksLeft());
+            lastDistributedBlock += blocksToDistribute;
 
-        rewardToken.safeTransfer(stakingContract, blocksToDistribute.mul(rewardPerBlock));
+            rewardToken.safeTransfer(stakingContract, blocksToDistribute.mul(rewardPerBlock));
+        }
     }
 
     function min(uint256 a, uint256 b) internal pure returns (uint256) {
