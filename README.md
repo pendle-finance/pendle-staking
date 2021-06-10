@@ -1,4 +1,4 @@
-# xPENDLE
+# PENDLE single sided staking
 
 ## Introduction
 
