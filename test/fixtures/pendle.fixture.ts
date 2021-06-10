@@ -1,4 +1,4 @@
-import PENDLE from '../../build/artifacts/contracts/tokens/PENDLE.sol/PENDLE.json';
+import TestPENDLE from '../../build/artifacts/contracts/tokens/TestPENDLE.sol/TestPENDLE.json';
 import SingleStaking from '../../build/artifacts/contracts/SingleStaking.sol/SingleStaking.json'
 import SingleStakingManager from '../../build/artifacts/contracts/SingleStakingManager.sol/SingleStakingManager.json'
 import { 
@@ -27,7 +27,7 @@ export async function stakingPendleFixture(_: Wallet[],
 ): Promise<StakingPendleFixture> {
   const wallets = waffle.provider.getWallets();
   const [alice, bob, charlie, dave, eve] = wallets;
-  const pdl: Contract = await deployContract(alice, PENDLE, [
+  const pdl: Contract = await deployContract(alice, TestPENDLE, [
       "Pendle",
       "PENDLE",
       18
