@@ -82,8 +82,6 @@ describe('SingleStakingManager', function () {
     let scenario = (await generateRandomScenario(rewardPerBlock, 100, lastDistributedBlock, [alice, bob, charlie, dave]));
     let resultReward = (await calculateStakingResult(scenario, rewardPerBlock, lastDistributedBlock, [alice, bob, charlie, dave]));
     
-
-
     for(let action of scenario) {
       let block: BN = action.blockId;
       let newRewardPerBlock: BN = action.rewardPerBlock;
@@ -113,6 +111,7 @@ describe('SingleStakingManager', function () {
     }
 
     for(let i = 0; i < 4; ++i) {
+      // console.log((await pdl.balanceOf(wallets[i].address)).toString(), resultReward[i].toString());
       approxBigNumber(
         await pdl.balanceOf(wallets[i].address),
         resultReward[i],
