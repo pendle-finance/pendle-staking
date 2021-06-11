@@ -111,7 +111,6 @@ describe('SingleStakingManager', function () {
     }
 
     for(let i = 0; i < 4; ++i) {
-      // console.log((await pdl.balanceOf(wallets[i].address)).toString(), resultReward[i].toString());
       approxBigNumber(
         await pdl.balanceOf(wallets[i].address),
         resultReward[i],
