@@ -37,7 +37,7 @@ export async function stakingPendleFixture(_: Wallet[],
 
   const stakingManager: Contract = await deployContract(alice, SingleStakingManager, [
       pdl.address,
-      100000,
+      10000,
       (await provider.getBlockNumber()) + 10
     ],
     consts.HG 

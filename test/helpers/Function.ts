@@ -12,7 +12,6 @@ export interface Scenario{
     amount: BN
 };
 
-
 export async function generateRandomScenario(startRewardPerBlock: BN, nTest: Number, firstBlock: BN, wallets: Wallet[]): Promise<Scenario[]> {
     let fixedAmount = BN.from(1000000);
     let scenario: Scenario[] = [];
@@ -37,9 +36,9 @@ export async function generateRandomScenario(startRewardPerBlock: BN, nTest: Num
             stakingAction = 0;
         }
         
-        let amount = randomBN(fixedAmount);
+        let amount = fixedAmount.div(2).add(randomBN(fixedAmount));
         if (stakingAction == 1) {
-            amount = randomBN(amountEntered[userId].div(100));
+            amount = randomBN(amountEntered[userId].div(1000));
         }
 
         scenario.push({
@@ -49,6 +48,7 @@ export async function generateRandomScenario(startRewardPerBlock: BN, nTest: Num
             stakingAction,
             amount
         });
+
         if (stakingAction == 0){
             amountEntered[userId] = amountEntered[userId].add(amount);
         }

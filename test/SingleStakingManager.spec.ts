@@ -82,8 +82,6 @@ describe('SingleStakingManager', function () {
     let scenario = (await generateRandomScenario(rewardPerBlock, 100, lastDistributedBlock, [alice, bob, charlie, dave]));
     let resultReward = (await calculateStakingResult(scenario, rewardPerBlock, lastDistributedBlock, [alice, bob, charlie, dave]));
     
-
-
     for(let action of scenario) {
       let block: BN = action.blockId;
       let newRewardPerBlock: BN = action.rewardPerBlock;
