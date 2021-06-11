@@ -1,3 +1,4 @@
+import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@tenderly/hardhat-tenderly";
 import * as dotenv from "dotenv";
@@ -8,6 +9,8 @@ import "solidity-coverage";
 // import "@tenderly/hardhat-tenderly";
 dotenv.config();
 const dummyPrivateKey = '1111111111111111111111111111111111111111111111111111111111111111';
+
+require("./scripts/deployContracts");
 
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
@@ -102,7 +105,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200,
+            runs: 20000,
           },
         },
       },
@@ -110,6 +113,11 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 500000,
+  },
+  etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io/
+    apiKey: process.env.ETHERSCAN_KEY
   },
   tenderly: {
     username: "Yongkhang",

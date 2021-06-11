@@ -50,4 +50,5 @@ report
 
 # Environment
 .env
+.vscode
 typechain
