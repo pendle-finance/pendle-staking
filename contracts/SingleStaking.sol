@@ -11,13 +11,13 @@ contract SingleStaking {
     event Leave(address user, uint256 pendleAmount, uint256 shares);
 
     using SafeMath for uint256;
-    IERC20 public immutable rewardToken;
+    IERC20 public immutable pendle;
     SingleStakingManager public immutable stakingManager;
     mapping(address => uint256) public balances;
     uint256 public totalSupply;
 
-    constructor(IERC20 _rewardToken) {
-        rewardToken = _rewardToken;
+    constructor(IERC20 _pendle) {
+        pendle = _pendle;
         stakingManager = SingleStakingManager(msg.sender);
     }
 
@@ -26,21 +26,17 @@ contract SingleStaking {
         // Before doing anything, get the unclaimed rewards first
         stakingManager.distributeRewards();
         // Gets the amount of Pendle locked in the contract
-        uint256 totalRewardToken = rewardToken.balanceOf(address(this));
-        // Gets the amount of shares in existence
-        uint256 totalShares = totalSupply;
-        // If no shares exists, mint it 1:1 to the amount put in
-
-        if (totalShares == 0 || totalRewardToken == 0) {
+        uint256 totalPendle = pendle.balanceOf(address(this));
+        if (totalSupply == 0 || totalPendle == 0) {
+            // If no shares exists, mint it 1:1 to the amount put in
             sharesToMint = _amount;
-        }
-        // Calculate and mint the amount of shares the Pendle is worth. The ratio will change overtime, as shares is burned/minted and Pendle distributed to this contract
-        else {
-            sharesToMint = _amount.mul(totalShares).div(totalRewardToken);
+        } else {
+            // Calculate and mint the amount of shares the Pendle is worth. The ratio will change overtime, as shares is burned/minted and Pendle distributed to this contract
+            sharesToMint = _amount.mul(totalSupply).div(totalPendle);
         }
         _mint(msg.sender, sharesToMint);
         // Lock the Pendle in the contract
-        rewardToken.transferFrom(msg.sender, address(this), _amount);
+        pendle.transferFrom(msg.sender, address(this), _amount);
         emit Enter(msg.sender, _amount, sharesToMint);
     }
 
@@ -48,12 +44,10 @@ contract SingleStaking {
     function leave(uint256 _share) public returns (uint256 rewards) {
         // Before doing anything, get the unclaimed rewards first
         stakingManager.distributeRewards();
-        // Gets the amount of shares in existence
-        uint256 totalShares = totalSupply;
         // Calculates the amount of Pendle the shares is worth
-        rewards = _share.mul(rewardToken.balanceOf(address(this))).div(totalShares);
+        rewards = _share.mul(pendle.balanceOf(address(this))).div(totalSupply);
         _burn(msg.sender, _share);
-        rewardToken.transfer(msg.sender, rewards);
+        pendle.transfer(msg.sender, rewards);
         emit Leave(msg.sender, rewards, _share);
     }
 
