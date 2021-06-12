@@ -12,20 +12,24 @@ contract SingleStakingManager is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    IERC20 public immutable rewardToken;
+    IERC20 public immutable pendle;
     address public immutable stakingContract;
 
     uint256 public rewardPerBlock;
-    uint256 public lastDistributedBlock;
+    uint256 public finishedDistToBlock;
 
-    constructor(IERC20 _rewardToken, uint256 _rewardPerBlock, uint256 _startBlock) {
-        require(address(_rewardToken) != address(0), "ZERO_ADDRESS");
+    constructor(
+        IERC20 _pendle,
+        uint256 _rewardPerBlock,
+        uint256 _startBlock
+    ) {
+        require(address(_pendle) != address(0), "ZERO_ADDRESS");
         require(_rewardPerBlock != 0, "ZERO_REWARD_PER_BLOCK");
         require(_startBlock > block.number, "PAST_BLOCK_START");
-        rewardToken = _rewardToken;
+        pendle = _pendle;
         rewardPerBlock = _rewardPerBlock;
-        stakingContract = address(new SingleStaking(_rewardToken));
-        lastDistributedBlock = _startBlock;
+        stakingContract = address(new SingleStaking(_pendle));
+        finishedDistToBlock = _startBlock;
     }
 
     function distributeRewards() external {
@@ -40,18 +44,17 @@ contract SingleStakingManager is Ownable {
     }
 
     function getBlocksLeft() public view returns (uint256 blocksLeft) {
-        uint256 currentRewardBalance = rewardToken.balanceOf(address(this));
+        uint256 currentRewardBalance = pendle.balanceOf(address(this));
         blocksLeft = currentRewardBalance.div(rewardPerBlock);
     }
 
     // Distribute the rewards to the staking contract, until the latest block, or until we run out of rewards
     function _distributeRewardsInternal() internal {
-        if (lastDistributedBlock < block.number) {
-            uint256 blocksToDistribute = min(block.number.sub(lastDistributedBlock), getBlocksLeft());
-            lastDistributedBlock += blocksToDistribute;
+        if (finishedDistToBlock >= block.number) return;
+        uint256 blocksToDistribute = min(block.number.sub(finishedDistToBlock), getBlocksLeft());
+        finishedDistToBlock += blocksToDistribute;
 
-            rewardToken.safeTransfer(stakingContract, blocksToDistribute.mul(rewardPerBlock));
-        }
+        pendle.safeTransfer(stakingContract, blocksToDistribute.mul(rewardPerBlock));
     }
 
     function min(uint256 a, uint256 b) internal pure returns (uint256) {
