@@ -91,7 +91,7 @@ const config: HardhatUserConfig = {
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`,
       accounts: [`${process.env.PRIVATE_KEYS || dummyPrivateKey}`],
-      gasPrice: 130 * 1000000000,
+      gasPrice: 14 * 1000000000,
       timeout: 200000,
     }
   },

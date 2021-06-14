@@ -1,15 +1,6 @@
-import { 
-  BigNumber as BN, 
-  utils, 
-  Contract, 
-  Wallet, 
-  providers 
-} from 'ethers';
+import { BigNumber as BN, utils, Contract, Wallet, providers } from 'ethers';
 
-import { 
-  StakingPendleFixture, 
-  stakingPendleFixture 
-} from './fixtures/pendle.fixture';
+import { StakingPendleFixture, stakingPendleFixture } from './fixtures/pendle.fixture';
 
 import {
   consts,
@@ -17,12 +8,12 @@ import {
   generateRandomScenario,
   minerStart,
   minerStop,
-  evm_snapshot, 
-  mineBlock, 
+  evm_snapshot,
+  mineBlock,
   getCurrentBlock,
   evm_revert,
   calculateStakingResult,
-  approxBigNumber
+  approxBigNumber,
 } from './helpers';
 
 const { waffle } = require('hardhat');
@@ -54,7 +45,7 @@ describe('SingleStakingManager', function () {
   }
 
   async function mineToBlock(blockNumber: number): Promise<void> {
-    while((await getCurrentBlock()) <= blockNumber) {
+    while ((await getCurrentBlock()) <= blockNumber) {
       await mineBlock();
     }
   }
@@ -76,47 +67,46 @@ describe('SingleStakingManager', function () {
   });
 
   it('Staking PENDLE tests', async function () {
-    let lastDistributedBlock: BN = (await stakingManager.lastDistributedBlock());
-    let rewardPerBlock: BN = (await stakingManager.rewardPerBlock());
-    
-    let scenario = (await generateRandomScenario(rewardPerBlock, 100, lastDistributedBlock, [alice, bob, charlie, dave]));
-    let resultReward = (await calculateStakingResult(scenario, rewardPerBlock, lastDistributedBlock, [alice, bob, charlie, dave]));
-    
-    for(let action of scenario) {
+    let finishedDistToBlock: BN = await stakingManager.finishedDistToBlock();
+    let rewardPerBlock: BN = await stakingManager.rewardPerBlock();
+
+    let scenario = await generateRandomScenario(rewardPerBlock, 100, finishedDistToBlock, [alice, bob, charlie, dave]);
+    let resultReward = await calculateStakingResult(scenario, rewardPerBlock, finishedDistToBlock, [
+      alice,
+      bob,
+      charlie,
+      dave,
+    ]);
+
+    for (let action of scenario) {
       let block: BN = action.blockId;
       let newRewardPerBlock: BN = action.rewardPerBlock;
       let userId: number = action.userId;
       let user = wallets[userId];
       let stakingAction: number = action.stakingAction;
-      let amount: BN = action.amount; 
+      let amount: BN = action.amount;
 
       await mineToBlock(block.toNumber() - 2);
-      
+
       await minerStop();
       if (!newRewardPerBlock.eq(rewardPerBlock)) {
         await stakingManager.adjustRewardPerBlock(newRewardPerBlock, consts.HG);
         rewardPerBlock = newRewardPerBlock;
       }
-      
+
       if (stakingAction == 0) {
         await pdl.connect(eve).transfer(user.address, amount, consts.HG);
         await pdl.connect(user).approve(stakingContract.address, amount);
         await stakingContract.connect(user).enter(amount, consts.HG);
-      }
-      else {
+      } else {
         await stakingContract.connect(user).leave(amount, consts.HG);
       }
       await mineBlock();
       await minerStart();
     }
 
-    for(let i = 0; i < 4; ++i) {
-      approxBigNumber(
-        await pdl.balanceOf(wallets[i].address),
-        resultReward[i],
-        10,
-        false
-      );
+    for (let i = 0; i < 4; ++i) {
+      approxBigNumber(await pdl.balanceOf(wallets[i].address), resultReward[i], 10, false);
     }
   });
 });
