@@ -5,6 +5,7 @@ import * as dotenv from "dotenv";
 // import "hardhat-typechain";
 import { HardhatUserConfig } from "hardhat/types";
 import "solidity-coverage";
+import "@nomiclabs/hardhat-etherscan";
 // import "@tenderly/hardhat-tenderly";
 dotenv.config();
 const dummyPrivateKey = '1111111111111111111111111111111111111111111111111111111111111111';
@@ -114,6 +115,11 @@ const config: HardhatUserConfig = {
   tenderly: {
     username: "Yongkhang",
     project: "pendle-finance"
+  },
+  etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io/
+    apiKey: process.env.ETHERSCAN_API
   }
 };
 
